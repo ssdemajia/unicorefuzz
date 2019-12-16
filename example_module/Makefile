@@ -1,4 +1,7 @@
 obj-m += procfs1.o
 
 all:
-	make -C ../linux-5.0.13-arch1 M=$(PWD) modules
+	make -C /home/ss/linux-5.2.21 M=$(PWD) modules
+clean:
+    rm -rf .tmp_versions
+    rm *.cmd *.o *.ko
