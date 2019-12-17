@@ -30,3 +30,5 @@ unicore_workdir
 unicorefuzz/uDdbg
 .fuse*
 unicorefuzz/AFLplusplus
+venv
+.gdb_history

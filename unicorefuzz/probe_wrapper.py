@@ -145,6 +145,7 @@ class ProbeWrapper(Unicorefuzz):
             with open(reg_file, "w") as f:
                 try:
                     val = target.read_register(reg)
+                    print("read reg {}: value {}".format(reg, val))
                     if isinstance(val, list):
                         # Avatar special registers (xmm, ...)
                         i32list = val

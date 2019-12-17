@@ -4,6 +4,11 @@ echo "================================================="
 echo "Unicorefuzz Installation script"
 echo "================================================="
 echo
+
+echo "[*] Update pip"
+pip install pip -U
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+
 echo "[*] Performing basic sanity checks..."
 
 if [ ! "$(uname -s)" = "Linux" ]; then
@@ -20,7 +25,7 @@ for i in wget python2 python3 automake autoconf sha384sum cmake; do
   T=$(which "$i" 2>/dev/null)
   if [ "$T" = "" ]; then
     echo "[-] Error: '$i' not found. Run 'sudo apt-get install $i'."
-    exit 1
+    sudo apt install -y $i
   fi
 done
 

@@ -288,9 +288,7 @@ class Harness(Unicorefuzz):
 
             # This will execute code -> starts afl-unicorn forkserver!
             x64utils.set_gs_base(uc, scratch_addr, gs_base)
-            # print("[d] setting gs_base to "+hex(gs))
             x64utils.set_fs_base(uc, scratch_addr, fs_base)
-            # print("[d] setting fs_base to "+hex(gs))
         else:
             # We still need to start the forkserver somehow to be consistent.
             # Let's emulate a nop for this.
