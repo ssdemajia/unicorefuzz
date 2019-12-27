@@ -357,6 +357,7 @@ class Harness(Unicorefuzz):
         """
         regs = self.fetch_all_regs()
         for key, value in regs.items():
+            print("[+] reg: {} (load)".format(key))
             if key in self.arch.ignored_regs:
                 # print("[d] Ignoring reg: {} (Ignored)".format(r))
                 continue

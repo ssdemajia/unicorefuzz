@@ -8,7 +8,7 @@ from unicorn.x86_const import UC_X86_REG_RAX, UC_X86_REG_RDX, UC_X86_REG_RDI, UC
 from unicorefuzz.unicorefuzz import Unicorefuzz
 
 # A place to put scratch memory to. Non-kernelspace address should be fine.
-SCRATCH_ADDR = 0x80000
+SCRATCH_ADDR = 0x0
 # How much scratch to add. We don't ask for much. Default should be fine.
 SCRATCH_SIZE = 0x1000
 
@@ -16,7 +16,7 @@ SCRATCH_SIZE = 0x1000
 PAGE_SIZE = 0x1000
 
 # Set a supported architecture
-ARCH = "x64"
+ARCH = "x86"
 
 # The gdb port to connect to
 GDB_HOST = "localhost"
@@ -27,14 +27,14 @@ GDB_PORT = 1234
 # BREAK_OFFSET = 0x10
 
 # Or this to break at a fixed offset.
-BREAK_ADDR = 0xffffffff8183e090  # ip_do_fragment address
+BREAK_ADDR = 0x30d4d0
 # You cannot set MODULE and BREAKOFFSET at the same time
 
 # Additional exits here.
 # The Exit at entry + LENGTH will be added automatically.
-EXITS = [0xffffffff81840244]
+EXITS = [0x3c80c0]
 # Exits realtive to the initial rip (entrypoint + addr)
-ENTRY_RELATIVE_EXITS = [2055]
+ENTRY_RELATIVE_EXITS = [39]
 
 # The location used to store data and logs
 WORKDIR = os.path.join(os.getcwd(), "unicore_workdir")
@@ -57,21 +57,6 @@ def init_func(unicore_fuzz, uc):
     pass
 
 
-# This function gets the current input and places it in the memory.
-# It will be called for each execution, so keep it lightweight.
-# This can be compared to a testcase in libfuzzer.
-# if you want to ignore an input, you can os._exit(0) here (anything else is a lot slower).
+
 def place_input(ucf: Unicorefuzz, uc: Uc, input: bytes) -> None:
-    """
-    Places the input in memory and alters the input.
-    This is an example for sk_buff in openvsswitch
-    """
-    if len(input) < 1500:
-        import os
-        os._exit(0)
-    rdx = uc.reg_read(UC_X86_REG_RDX)  # struct sk_buff* skb
-    ucf.map_page(uc, rdx)  # ensure sk_buf is mapped
-    data_ptr = struct.unpack("<Q", uc.mem_read(rdx + 0xD0, 8))[0]
-    ucf.map_page(uc, data_ptr)  # ensure the buffer is mapped
-    uc.mem_write(data_ptr, input)  # insert afl input
-    # pass
+    pass

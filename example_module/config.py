@@ -4,7 +4,7 @@ import os
 import struct
 
 from unicorn import Uc
-from unicorn.x86_const import UC_X86_REG_RAX, UC_X86_REG_RDX, UC_X86_REG_RDI
+from unicorn.x86_const import UC_X86_REG_RAX, UC_X86_REG_RDX, UC_X86_REG_RDI, UC_X86_REG_RSI
 from unicorefuzz.unicorefuzz import Unicorefuzz
 
 # A place to put scratch memory to. Non-kernelspace address should be fine.
@@ -32,9 +32,9 @@ BREAK_ADDR = None
 
 # Additional exits here.
 # The Exit at entry + LENGTH will be added automatically.
-EXITS = []
+EXITS = [0xffffffff812439c4]
 # Exits realtive to the initial rip (entrypoint + addr)
-ENTRY_RELATIVE_EXITS = []
+ENTRY_RELATIVE_EXITS = [78]
 
 # The location used to store data and logs
 WORKDIR = os.path.join(os.getcwd(), "unicore_workdir")
@@ -48,7 +48,7 @@ AFL_OUTPUTS = os.path.join(os.getcwd(), "afl_outputs")
 AFL_DICT = None
 
 
-def init_func(uc):
+def init_func(unicore_fuzz, uc):
     """
     An init function called before forking.
     This function may be used to set additional unicorn hooks and things.
@@ -73,8 +73,8 @@ def place_input_skb(ucf: Unicorefuzz, uc: Uc, input: bytes) -> None:
         os._exit(0)  # too big!
 
     # read input to the correct position at param rdx here:
-    rdx = uc.reg_read(UC_X86_REG_RDX)
-    rdi = uc.reg_read(UC_X86_REG_RDI)
+    rdx = uc.reg_read(UC_X86_REG_RDX)  # struct sk_buff* skb
+    rdi = uc.reg_read(UC_X86_REG_RDI)  # struct net *net
     ucf.map_page(uc, rdx)  # ensure sk_buf is mapped
     bufferPtr = struct.unpack("<Q", uc.mem_read(rdx + 0xD8, 8))[0]
     ucf.map_page(uc, bufferPtr)  # ensure the buffer is mapped
@@ -83,7 +83,9 @@ def place_input_skb(ucf: Unicorefuzz, uc: Uc, input: bytes) -> None:
 
 
 def place_input(ucf: Unicorefuzz, uc: Uc, input: bytes) -> None:
-    rax = uc.reg_read(UC_X86_REG_RAX)
+    ubuf = uc.reg_read(UC_X86_REG_RSI)
+    count = uc.reg_read(UC_X86_REG_RDX)
     # make sure the parameter memory is mapped
-    ucf.map_page(uc, rax)
-    uc.mem_write(rax, input)  # insert afl input
+    ucf.map_page(uc, ubuf)
+    uc.mem_write(ubuf, input)  # insert afl input
+    uc.reg_write(UC_X86_REG_RDX, len(input))
