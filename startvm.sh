@@ -1,7 +1,8 @@
 #!/bin/sh
 stty intr ^]
 echo "[*] ctrl+c remapped to ctrl+] for host"
-KERNEL=/home/ss/linux
+KERNEL=/home/ss/linux-4.8.1
+#KERNEL=/home/ss/linux
 IMG=/home/ss/IMAGE
 /home/ss/qemu-4.2.0/x86_64-softmmu/qemu-system-x86_64 \
   -hda $IMG/stretch.img \
@@ -9,7 +10,7 @@ IMG=/home/ss/IMAGE
 	-m 4096 \
 	-smp 1 \
 	-s \
-	-append "root=/dev/sda console=ttyS0 debug nokaslr quiet" \
+	-append "root=/dev/sda console=ttyS0 nokaslr nosmep nosmap quiet" \
 	-serial stdio \
 	-enable-kvm \
 	-display none \
